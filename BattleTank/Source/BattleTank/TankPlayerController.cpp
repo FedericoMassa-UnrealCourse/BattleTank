@@ -21,7 +21,8 @@ void ATankPlayerController::AimAtCrosshair()
 
 	// Where the crosshair hits
 	FVector OutHitLocation;
-	GetSightRayHitLocation(OutHitLocation);
+	if (GetSightRayHitLocation(OutHitLocation))
+		GetControlledTank()->AimAt(OutHitLocation);
 }
 
 bool ATankPlayerController::GetSightRayHitLocation(FVector & OutHitLocation) const

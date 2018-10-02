@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+#include "TankAimingComponent.h"
 #include "Tank.generated.h"
 
 UCLASS()
@@ -14,6 +15,11 @@ class BATTLETANK_API ATank : public APawn
 public:
 	// Sets default values for this pawn's properties
 	ATank();
+
+	void AimAt(const FVector& HitLocation);
+
+protected:
+	UTankAimingComponent* TankAimingComponent;
 
 protected:
 	// Called when the game starts or when spawned
