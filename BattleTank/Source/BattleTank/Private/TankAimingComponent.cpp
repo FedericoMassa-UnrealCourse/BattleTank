@@ -2,6 +2,9 @@
 
 #include "TankAimingComponent.h"
 #include "GameFramework/Actor.h"
+#include "Components/StaticMeshComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Engine/World.h"
 
 
 // Sets default values for this component's properties
@@ -15,7 +18,7 @@ UTankAimingComponent::UTankAimingComponent()
 }
 
 
-void UTankAimingComponent::AimAt(const FVector & HitLocation)
+void UTankAimingComponent::AimAt(const FVector & HitLocation, const float& LaunchSpeed)
 {
 	if (!GetOwner())
 	{
@@ -23,16 +26,45 @@ void UTankAimingComponent::AimAt(const FVector & HitLocation)
 		return;
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("%s aiming at %s"), *GetOwner()->GetName(), *HitLocation.ToString());
+	// Check if barrel was set on Tank blueprint
+	if (!Barrel)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Barrel not defined in TankAimingComponent"));
+		return;
+	}
+
+	auto StartLocation = Barrel->GetSocketLocation(FName("Projectile"));
+	FVector OutLaunchSpeed;
+
+	bool AimIsGood = UGameplayStatics::SuggestProjectileVelocity(
+		this,
+		OutLaunchSpeed,
+		StartLocation,
+		HitLocation,
+		LaunchSpeed,
+		false,
+		0.0F,
+		0.0F,
+		ESuggestProjVelocityTraceOption::DoNotTrace);
+
+	//UE_LOG(LogTemp, Warning, TEXT("%s aiming from %s to %s"), *GetOwner()->GetName(), *StartLocation.ToString(), *HitLocation.ToString());
+
+	if (AimIsGood)
+	{
+		FVector AimDirection = OutLaunchSpeed.GetSafeNormal();
+		UE_LOG(LogTemp, Warning, TEXT("Aiming at %s"), *AimDirection.ToString());
+	}
+}
+
+void UTankAimingComponent::SetBarrel(UStaticMeshComponent * BarrelToSet)
+{
+	Barrel = BarrelToSet;
 }
 
 // Called when the game starts
 void UTankAimingComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// ...
-	
 }
 
 
