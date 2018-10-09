@@ -14,6 +14,9 @@ void UTankAimingComponent::MoveBarrelTowards(FVector AimDirection)
 	auto BarrelRotator = Barrel->GetForwardVector().Rotation();
 	auto AimRotator = AimDirection.Rotation();
 	auto DeltaRotator = AimRotator - BarrelRotator;
+
+	Barrel->Elevate(DeltaRotator.Pitch);
+
 }
 
 // Sets default values for this component's properties
