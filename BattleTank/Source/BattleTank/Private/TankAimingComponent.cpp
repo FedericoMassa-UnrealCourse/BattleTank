@@ -6,6 +6,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Engine/World.h"
 #include "TankBarrel.h"
+#include "TankTurret.h"
 
 
 void UTankAimingComponent::MoveBarrelTowards(FVector AimDirection)
@@ -16,7 +17,13 @@ void UTankAimingComponent::MoveBarrelTowards(FVector AimDirection)
 	auto DeltaRotator = AimRotator - BarrelRotator;
 
 	Barrel->Elevate(DeltaRotator.Pitch);
+	
+	// Decide what direction it is easier to rotate the turret
+	// If rotation is > 180 it means that it would be easier rotating the other way
+	if (FMath::Abs(DeltaRotator.Yaw) > 180)
+		DeltaRotator.Yaw -= 360 * FMath::Sign(DeltaRotator.Yaw);
 
+	Turret->Rotate(DeltaRotator.Yaw);
 }
 
 // Sets default values for this component's properties
@@ -45,6 +52,13 @@ void UTankAimingComponent::AimAt(const FVector & HitLocation, const float& Launc
 		return;
 	}
 
+	// Check if barrel was set on Tank blueprint
+	if (!Turret)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Turret not defined in TankAimingComponent"));
+		return;
+	}
+
 	auto StartLocation = Barrel->GetSocketLocation(FName("Projectile"));
 	FVector OutLaunchSpeed;
 
@@ -69,4 +83,9 @@ void UTankAimingComponent::AimAt(const FVector & HitLocation, const float& Launc
 void UTankAimingComponent::SetBarrel(UTankBarrel * BarrelToSet)
 {
 	Barrel = BarrelToSet;
+}
+
+void UTankAimingComponent::SetTurret(UTankTurret * TurretToSet)
+{
+	Turret = TurretToSet;
 }

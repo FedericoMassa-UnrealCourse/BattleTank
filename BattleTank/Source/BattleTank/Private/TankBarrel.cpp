@@ -15,7 +15,9 @@ void UTankBarrel::Elevate(float RelativePitch)
 	// Clamping
 	RawNewElevation = FMath::Clamp<float>(RawNewElevation, MinElevationDegrees, MaxElevationDegrees);
 
-	SetRelativeRotation(FRotator(RawNewElevation, 0, 0));
+	// Avoid flickering: TODO implement a better control to avoid this
+	if (FMath::Abs(RelativePitch) > AnglePrecision)
+		SetRelativeRotation(FRotator(RawNewElevation, 0, 0));
 }
 
 

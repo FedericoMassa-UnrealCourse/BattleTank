@@ -27,5 +27,6 @@ private:
 	UPROPERTY(EditAnywhere, Category = Setup)
 	float MaxElevationDegrees = 40.f;
 
+	float AnglePrecision = 0.5f;
 
 };
